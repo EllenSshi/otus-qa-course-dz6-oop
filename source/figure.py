@@ -7,8 +7,9 @@ class Figure:
     __angles = None
     __perimeter = None
 
-    def __init__(self, name):
+    def __init__(self, name, angles):
         self.__name = name
+        self.__angles = angles
 
     def __str__(self):
         return self.__name
@@ -19,14 +20,6 @@ class Figure:
 
     @property
     def angles(self):
-        if isinstance(self, Triangle):
-            self.__angles = 3
-        elif isinstance(self, Rectangle) or isinstance(self, Square):
-            self.__angles = 4
-        elif isinstance(self, Circle):
-            self.__angles = 0
-        else:
-            print("This object is not a geometric figure!")
         return self.__angles
 
     @property
@@ -71,7 +64,7 @@ class Triangle(Figure):
             self._first_side = first_side
             self._second_side = second_side
             self._third_side = third_side
-            super().__init__("Треугольник")
+            super().__init__("Треугольник", 3)
         else:
             raise AttributeError("Такой треугольник создать нельзя! Любая сторона треугольника "
                                  "меньше суммы двух других сторон и больше их разности")
@@ -82,7 +75,7 @@ class Rectangle(Figure):
         if length > 0 and width > 0:
             self._length = length
             self._width = width
-            super().__init__("Прямоугольник")
+            super().__init__("Прямоугольник", 4)
         else:
             raise AttributeError("Такой прямоугольник создать нельзя! Длина и ширина прямоугольника "
                                  "должны быть положительным числом, большим 0!")
@@ -92,7 +85,7 @@ class Square(Figure):
     def __init__(self, side):
         if side > 0:
             self._side = side
-            super().__init__("Квадрат")
+            super().__init__("Квадрат", 4)
         else:
             raise AttributeError("Такой квадрат создать нельзя! "
                                  "Сторона квадрата должна быть положительным числом, большим 0!")
@@ -102,7 +95,7 @@ class Circle(Figure):
     def __init__(self, radius):
         if radius > 0:
             self._radius = radius
-            super().__init__("Круг")
+            super().__init__("Круг", 0)
         else:
             raise AttributeError("Такой круг создать нельзя! "
                                  "Радиус круга должен быть положительным числом, большим 0!")
