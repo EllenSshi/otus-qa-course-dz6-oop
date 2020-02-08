@@ -1,4 +1,5 @@
 import math
+from abc import abstractmethod
 
 
 class Figure:
@@ -23,33 +24,43 @@ class Figure:
         return self.__angles
 
     @property
+    @abstractmethod
     def area(self):
-        if isinstance(self, Square):
-            self.__area = math.pow(self._side, 2)
-        elif isinstance(self, Triangle):
-            semiperimeter = (self._first_side + self._second_side + self._third_side) / 2
-            self.__area = math.sqrt(
-                semiperimeter * (semiperimeter - self._first_side) * (semiperimeter - self._second_side) * (
-                        semiperimeter - self._third_side))
-        elif isinstance(self, Rectangle):
-            self.__area = self._length * self._width
-        elif isinstance(self, Circle):
-            self.__area = math.pi * math.pow(self._radius, 2)
-        return round(self.__area, 1)
+        return NotImplemented
 
     @property
+    @abstractmethod
     def perimeter(self):
-        if isinstance(self, Square):
-            self.__perimeter = self._side * 4
-        elif isinstance(self, Triangle):
-            self.__perimeter = self._first_side + self._second_side + self._third_side
-        elif isinstance(self, Rectangle):
-            self.__perimeter = self._length * 2 + self._width * 2
-        elif isinstance(self, Circle):
-            self.__perimeter = math.pi * self._radius * 2
-        return round(self.__perimeter)
+        return NotImplemented
+
+    @staticmethod
+    def distance(a: list, b: list):
+        """
+        Метод возвращает расстояние между двумя точками, лежащими в прямоугольной системе координат.
+        Принимает два аргумента: a - координаты точки A, напр. [1, 5],
+        b - координаты точки B, напр. [2, 3].
+        """
+        xa = a[0]
+        xb = b[0]
+        ya = a[1]
+        yb = b[1]
+        return round(math.sqrt(math.pow(xb - xa, 2) + math.pow(yb - ya, 2)), 1)
+
+    @staticmethod
+    def is_on_one_line(a: list, b: list, c: list):
+        """
+        Проверяет, лежат ли точки на одной прямой.
+        Принимает три аргумента: a, b, c - координаты точек, образующих треугольник.
+        Возвращает True, если точки лежат на одной прямой. Иначе - False.
+        Уравнение прямой (x-x1)/(x2-x1) = (y-y1)/(y2-y1)
+        """
+        return (c[0] - a[0])/(b[0] - a[0]) == (c[1] - a[1])/(b[1] - a[1])
 
     def add_area(self, figure):
+        """
+        Метод возвращает сумму площадей двух фигур.
+        Принимает в качестве аргумента другую геометрическую фигуру.
+        """
         if isinstance(figure, Figure):
             return round(self.area + figure.area, 1)
         else:
@@ -57,45 +68,108 @@ class Figure:
 
 
 class Triangle(Figure):
-    def __init__(self, first_side, second_side, third_side):
-        if second_side + third_side > first_side > math.fabs(second_side - third_side) and \
-                first_side + third_side > second_side > math.fabs(first_side - third_side) and \
-                first_side + second_side > third_side > math.fabs(first_side - second_side):
-            self._first_side = first_side
-            self._second_side = second_side
-            self._third_side = third_side
-            super().__init__("Треугольник", 3)
+    def __init__(self, a_point: list, b_point: list, c_point: list):
+        """
+        Создает объект класса "Треугольник"
+        Принимает три аргумента: a_point - координаты точки A,
+        b_point - координаты точки B, c_point - координаты точки С.
+        Координаты точек задаются списком из двух значений - по оси X, и по оси Y
+        """
+        if self.is_on_one_line(a_point, b_point, c_point):
+            raise AttributeError("Такой треугольник создать нельзя! Точки A, B и C лежат на одной прямой.")
         else:
-            raise AttributeError("Такой треугольник создать нельзя! Любая сторона треугольника "
-                                 "меньше суммы двух других сторон и больше их разности")
+            self.__side_one = self.distance(a_point, b_point)
+            self.__side_two = self.distance(a_point, c_point)
+            self.__side_three = self.distance(b_point, c_point)
+            super().__init__("Треугольник", 3)
+
+    @property
+    def area(self):
+        semiperimeter = (self.__side_one + self.__side_two + self.__side_three) / 2
+        self.__area = math.sqrt(
+            semiperimeter * (semiperimeter - self.__side_one) * (semiperimeter - self.__side_two) * (
+                    semiperimeter - self.__side_three))
+        return round(self.__area, 1)
+
+    @property
+    def perimeter(self):
+        self.__perimeter = self.__side_one + self.__side_two + self.__side_three
+        return round(self.__perimeter, 1)
 
 
 class Rectangle(Figure):
-    def __init__(self, length, width):
-        if length > 0 and width > 0:
-            self._length = length
-            self._width = width
-            super().__init__("Прямоугольник", 4)
-        else:
-            raise AttributeError("Такой прямоугольник создать нельзя! Длина и ширина прямоугольника "
-                                 "должны быть положительным числом, большим 0!")
+    def __init__(self, a_point: list, b_point: list, c_point: list):
+        """
+        Создает объект класса "Прямоугольник"
+        Принимает три аргумента: a_point - координаты точки A,
+        b_point - координаты точки B, c_point - координаты точки С.
+        Точки A и B соединяют одну сторону прямоугольника,
+        а точки B и C - вторую сторону.
+        Координаты точек задаются списком из двух значений - по оси X, и по оси Y
+        """
+        self.__side_one = self.distance(a_point, b_point)
+        self.__side_two = self.distance(b_point, c_point)
+        super().__init__("Прямоугольник", 4)
+
+    @property
+    def area(self):
+        self.__area = self.__side_one * self.__side_two
+        return round(self.__area, 1)
+
+    @property
+    def perimeter(self):
+        self.__perimeter = self.__side_one * 2 + self.__side_two * 2
+        return round(self.__perimeter)
 
 
 class Square(Figure):
-    def __init__(self, side):
-        if side > 0:
-            self._side = side
-            super().__init__("Квадрат", 4)
-        else:
-            raise AttributeError("Такой квадрат создать нельзя! "
-                                 "Сторона квадрата должна быть положительным числом, большим 0!")
+    def __init__(self, a_point: list, b_point: list):
+        """
+        Создает объект класса "Квадрат"
+        Принимает два аргумента: a_point - координаты точки A,
+        b_point - координаты точки B.
+        Координаты точек задаются списком из двух значений - по оси X, и по оси Y
+        """
+        if a_point == b_point:
+            raise AttributeError("Такой квадрат создать нельзя! Координаты точек A и B одной из сторон совпадают.")
+        self.__side = self.distance(a_point, b_point)
+        super().__init__("Квадрат", 4)
+
+    @property
+    def area(self):
+        self.__area = math.pow(self.__side, 2)
+        return round(self.__area, 1)
+
+    @property
+    def perimeter(self):
+        self.__perimeter = self.__side * 4
+        return round(self.__perimeter)
 
 
 class Circle(Figure):
-    def __init__(self, radius):
-        if radius > 0:
-            self._radius = radius
-            super().__init__("Круг", 0)
+    def __init__(self, center_point: list, circle_point: list):
+        """
+        Создает объект класса "Окружность"
+        Принимает два аргумента: center_point - координаты центра окружности,
+        circle_point - координаты точки, лежащей на окружности.
+        Координаты точек задаются списком из двух значений - по оси X, и по оси Y
+        """
+        if center_point == circle_point:
+            raise AttributeError("Такой круг создать нельзя! Центр окружности совпадает с точкой окружности.")
         else:
-            raise AttributeError("Такой круг создать нельзя! "
-                                 "Радиус круга должен быть положительным числом, большим 0!")
+            self.__radius = self.distance(center_point, circle_point)
+            super().__init__("Круг", 0)
+
+    @property
+    def area(self):
+        self.__area = math.pi * math.pow(self.__radius, 2)
+        return round(self.__area, 1)
+
+    @property
+    def perimeter(self):
+        self.__perimeter = math.pi * self.__radius * 2
+        return round(self.__perimeter)
+
+
+sq = Square([2, 1], [4, 1])
+print(sq.area)

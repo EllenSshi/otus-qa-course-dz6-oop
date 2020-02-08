@@ -3,51 +3,45 @@ from source.figure import Circle, Triangle
 
 
 def test_create_circle_with_proper_side():
-    circle = Circle(5)
+    circle = Circle([0, 0], [3, 5])
     assert circle.name == "Круг"
 
 
 def test_create_circle_with_bad_side():
     with pytest.raises(AttributeError):
-        Circle(0)
+        Circle([1, 1], [1, 1])
 
 
 def test_circle_angles():
-    circle = Circle(1)
+    circle = Circle([0, 0], [3, 5])
     assert circle.angles == 0
 
 
-@pytest.mark.parametrize("radius, perimeter",
-                         [(3, 19),
-                          (12, 75),
-                          (4, 25)],
-                         ids=["radius: 3; perimeter: 19",
-                              "radius: 12; perimeter: 75",
-                              "radius: 4; perimeter: 25"])
-def test_circle_perimeter(radius, perimeter):
-    circle = Circle(radius)
+@pytest.mark.parametrize("center_point, circle_point, perimeter",
+                         [([0, 0], [3, 5], 36),
+                          ([0, 0], [3, 4], 31),
+                          ([1, 1], [6, 6], 45)])
+def test_circle_perimeter(center_point, circle_point, perimeter):
+    circle = Circle(center_point, circle_point)
     assert circle.perimeter == perimeter
 
 
-@pytest.mark.parametrize("radius, area",
-                         [(3, 28.3),
-                          (12, 452.4),
-                          (4, 50.3)],
-                         ids=["radius: 3; area: 28.3",
-                              "radius: 12; area: 452.4",
-                              "radius: 4; area: 50.3"])
-def test_circle_area(radius, area):
-    circle = Circle(radius)
+@pytest.mark.parametrize("center_point, circle_point, area",
+                         [([0, 0], [3, 5], 105.7),
+                          ([0, 0], [3, 4], 78.5),
+                          ([1, 1], [6, 6], 158.4)])
+def test_circle_area(center_point, circle_point, area):
+    circle = Circle(center_point, circle_point)
     assert circle.area == area
 
 
 def test_add_area_of_another_figure():
-    circle = Circle(4)
-    triangle = Triangle(2, 4, 5)
-    assert circle.add_area(triangle) == 54.1
+    circle = Circle([0, 0], [3, 5])
+    triangle = Triangle([1, -2], [0.5, -4], [6, -3])
+    assert circle.add_area(triangle) == 111.0
 
 
 def test_add_square_of_not_a_figure():
-    circle = Circle(3)
+    circle = Circle([0, 0], [3, 5])
     with pytest.raises(AttributeError):
         circle.add_area("add some area = 10")

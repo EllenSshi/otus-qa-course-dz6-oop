@@ -3,51 +3,45 @@ from source.figure import Rectangle, Square
 
 
 def test_create_rectangle_with_proper_sides():
-    rectangle = Rectangle(2, 4)
+    rectangle = Rectangle([1, 5], [1, 1], [7, 1])
     assert rectangle.name == "Прямоугольник"
 
 
-def test_create_rectangle_with_bad_sides():
-    with pytest.raises(AttributeError):
-        Rectangle(0, 2)
+# def test_create_rectangle_with_bad_sides():
+#     with pytest.raises(AttributeError):
+#         Rectangle(0, 2)
 
 
 def test_rectangle_angles():
-    rectangle = Rectangle(3, 4)
+    rectangle = Rectangle([1, 5], [1, 1], [7, 1])
     assert rectangle.angles == 4
 
 
-@pytest.mark.parametrize("length, width, perimeter",
-                         [(3, 4, 14),
-                          (1, 1, 4),
-                          (2, 4, 12)],
-                         ids=["sides: 3, 4; perimeter: 14",
-                              "sides: 1, 1; perimeter: 4",
-                              "sides: 2, 4; perimeter: 12"])
-def test_rectangle_perimeter(length, width, perimeter):
-    rectangle = Rectangle(length, width)
-    assert rectangle.perimeter == perimeter
-
-
-@pytest.mark.parametrize("length, width, area",
-                         [(3, 4, 12),
-                          (1, 9, 9),
-                          (2, 4, 8)],
-                         ids=["sides: 3, 4; area: 12",
-                              "sides: 1, 9; area: 9",
-                              "sides: 2, 4; area: 8"])
-def test_rectangle_area(length, width, area):
-    rectangle = Rectangle(length, width)
+@pytest.mark.parametrize("a_point, b_point, c_point, area",
+                         [([1, 5], [1, 1], [7, 1], 24.0),
+                          ([1, 4], [1, 1], [7, 1], 18.0),
+                          ([0, 5], [0, 0], [9, 0], 45.0)])
+def test_rectangle_area(a_point, b_point, c_point, area):
+    rectangle = Rectangle(a_point, b_point, c_point)
     assert rectangle.area == area
 
 
+@pytest.mark.parametrize("a_point, b_point, c_point, perimeter",
+                         [([1, 5], [1, 1], [7, 1], 20),
+                          ([1, 4], [1, 1], [7, 1], 18),
+                          ([0, 5], [0, 0], [9, 0], 28)])
+def test_rectangle_perimeter(a_point, b_point, c_point, perimeter):
+    rectangle = Rectangle(a_point, b_point, c_point)
+    assert rectangle.perimeter == perimeter
+
+
 def test_add_area_of_another_figure():
-    rectangle = Rectangle(3, 6)
-    square = Square(4)
-    assert rectangle.add_area(square) == 34.0
+    rectangle = Rectangle([0, 5], [0, 0], [9, 0])
+    square = Square([-1, 0], [-5, -5])
+    assert rectangle.add_area(square) == 86.0
 
 
 def test_add_square_of_not_a_figure():
-    rectangle = Rectangle(3, 6)
+    rectangle = Rectangle([1, 5], [1, 1], [7, 1])
     with pytest.raises(AttributeError):
         rectangle.add_area(0)
